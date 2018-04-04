@@ -14,8 +14,8 @@ import java.lang.annotation.*;
 @ReportAsSingleViolation
 public @interface Order1 {
 
-    public abstract String message() default "Must have 1";
-    public abstract Class<?>[] groups() default {};
-    public abstract Class<? extends Payload>[] payload() default {};
+    String message() default "Must have 1";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
 
 }
