@@ -35,7 +35,6 @@ public class SampleResource {
         }
     }
 
-
     @GET
     @Path("/")
     public Response get(@NotEmpty @Size(min = 1 , max = 10) @QueryParam("param") String param){

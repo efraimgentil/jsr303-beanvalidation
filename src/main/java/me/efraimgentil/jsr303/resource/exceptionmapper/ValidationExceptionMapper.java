@@ -1,6 +1,5 @@
 package me.efraimgentil.jsr303.resource.exceptionmapper;
 
-import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 
 import javax.validation.ConstraintViolation;
@@ -32,18 +31,18 @@ public class ValidationExceptionMapper implements ExceptionMapper<ConstraintViol
 
     @Override
     public Response toResponse(ConstraintViolationException e) {
-        System.out.println(e);
-        e.printStackTrace();
-        List<ConstraintError> collect = e.getConstraintViolations().stream()
-                .map( cv -> new ConstraintError(retrieveFieldName( cv ), cv.getMessage()) )
-                .collect(Collectors.toList());
-        //oh yeah... you need to shell out some $$ !
         return Response.status(Response.Status.BAD_REQUEST)
-                .entity(collect)
+                .entity(prepareErrors(e))
                 .build();
     }
 
-    public String retrieveFieldName(ConstraintViolation cv){
+    protected List<ConstraintError> prepareErrors(ConstraintViolationException cve){
+        return cve.getConstraintViolations().stream()
+                .map( cv -> new ConstraintError(retrieveFieldName( cv ), cv.getMessage()) )
+                .collect(Collectors.toList());
+    }
+
+    protected String retrieveFieldName(ConstraintViolation cv){
         PathImpl path = ((PathImpl)cv.getPropertyPath());
         if(ElementKind.PARAMETER.equals(path.getLeafNode().getKind())){
             return path.getLeafNode().getName();
