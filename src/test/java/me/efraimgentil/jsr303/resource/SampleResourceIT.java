@@ -1,44 +1,14 @@
 package me.efraimgentil.jsr303.resource;
 
 
-import io.restassured.RestAssured;
-import io.restassured.filter.log.ResponseLoggingFilter;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-
-import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class SampleResourceIT {
-
-    @Autowired
-    TestRestTemplate restTemplate;
-
-    @Value("${local.server.port}")
-    private int serverPort;
-
-    @Before
-    public void setUp(){
-        RestAssured.port = serverPort;
-        RestAssured.filters(Arrays.asList( new ResponseLoggingFilter()));
-    }
+public class SampleResourceIT extends BaseITConfig {
 
     @Test
     public void shouldReturnErrorWhenDoesNotSendParam() {
