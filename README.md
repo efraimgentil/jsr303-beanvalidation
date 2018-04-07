@@ -18,5 +18,5 @@ Examples:
 - JSR-303 (Hibernate impl)
 - Maven
 - Rest-Assured
-- Junit
+- Junit 
 - Mockito
