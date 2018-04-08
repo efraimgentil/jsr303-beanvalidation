@@ -1,5 +1,7 @@
 package me.efraimgentil.jsr303.resource;
 
+import me.efraimgentil.jsr303.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.Max;
@@ -15,10 +17,14 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 public class UserResource {
 
+
+    @Autowired
+    UserRepository userRepository;
+
     @GET
     public Response getUser( @NotNull @Min(1) @Max(50) @QueryParam("limit") Integer limit){
 
-        return Response.ok().build();
+        return Response.ok(userRepository.findAll()).build();
     }
 
 }
