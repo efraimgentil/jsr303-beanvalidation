@@ -1,11 +1,12 @@
 package me.efraimgentil.jsr303.resource;
 
 import me.efraimgentil.jsr303.repository.UserRepository;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -22,9 +23,9 @@ public class UserResource {
     UserRepository userRepository;
 
     @GET
-    public Response getUser( @NotNull @Min(1) @Max(50) @QueryParam("limit") Integer limit){
-
-        return Response.ok(userRepository.findAll()).build();
+    public Response list(@NotNull @Range(min = 1 , max = 50) @QueryParam("limit") Integer limit,
+                            @DefaultValue("0") @QueryParam("page") @Range(min = 0 , max = Integer.MAX_VALUE) Integer page){
+        return Response.ok(userRepository.findAll(PageRequest.of(0 , limit ))).build();
     }
 
 }
