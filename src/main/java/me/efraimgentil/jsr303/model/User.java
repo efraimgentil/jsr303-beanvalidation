@@ -1,6 +1,7 @@
 package me.efraimgentil.jsr303.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 @Entity
@@ -11,10 +12,13 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank
     private String fullName;
 
-    private String preferedName;
+    @NotBlank
+    private String preferredName;
 
+    @NotBlank
     private String userName;
 
 
@@ -23,7 +27,7 @@ public class User implements Serializable {
         return "User{" +
                 "id=" + id +
                 ", fullName='" + fullName + '\'' +
-                ", preferedName='" + preferedName + '\'' +
+                ", preferredName='" + preferredName + '\'' +
                 ", userName='" + userName + '\'' +
                 '}';
     }
@@ -59,12 +63,12 @@ public class User implements Serializable {
         this.fullName = fullName;
     }
 
-    public String getPreferedName() {
-        return preferedName;
+    public String getPreferredName() {
+        return preferredName;
     }
 
-    public void setPreferedName(String preferedName) {
-        this.preferedName = preferedName;
+    public void setPreferredName(String preferredName) {
+        this.preferredName = preferredName;
     }
 
     public String getUserName() {

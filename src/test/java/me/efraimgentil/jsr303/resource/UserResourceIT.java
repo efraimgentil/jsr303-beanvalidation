@@ -3,6 +3,10 @@ package me.efraimgentil.jsr303.resource;
 import me.efraimgentil.jsr303.model.User;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+
+import javax.ws.rs.core.MediaType;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
@@ -11,7 +15,6 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 
 public class UserResourceIT extends BaseITConfig {
-
 
     private final String GET_USERS = "/users";
     private final String CREATE_USER = GET_USERS;
@@ -70,7 +73,6 @@ public class UserResourceIT extends BaseITConfig {
                 .body("number" , is(0));
     }
 
-
     @Test
     public void shouldReturnBadRequestIfUserIdDoesNotExists(){
         given()
@@ -84,27 +86,52 @@ public class UserResourceIT extends BaseITConfig {
     }
 
     @Test
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:sql/createUsers.sql"),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:sql/deleteUsers.sql")
+    })
     public void shouldReturnTheUserIfTheUserIdExists(){
         given()
                 .pathParam("userId" , 1)
-                .when()
+        .when()
                 .get(GET_USER)
-                .then()
+        .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("$" , hasKey("id"))
                 .body("$" , hasKey("fullName"))
-                .body("$" , hasKey("preferedName"))
+                .body("$" , hasKey("preferredName"))
                 .body("$" , hasKey("userName"));
     }
 
     @Test
     public void shouldCreateAnNewUser(){
+        User user = new User();
+        user.setFullName("Full Name");
+        user.setUserName("username");
+        user.setPreferredName("Preferred Name");
         given()
-                .body(new User())
+                .body(user)
+               .contentType(MediaType.APPLICATION_JSON)
         .when()
                 .post(CREATE_USER)
         .then()
                 .statusCode(HttpStatus.CREATED.value());
+    }
+
+    @Test
+    public void shouldReturnErrorIfTheConstrainstAreNotValid(){
+        given()
+                .body(new User())
+                .contentType(MediaType.APPLICATION_JSON)
+        .when()
+                .post(CREATE_USER)
+        .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("$.size()" , is(3))
+                .body("fieldName" , hasItems("fullName" , "userName" , "preferredName"))
+                .body("findAll{ it.fieldName == 'fullName' }.error" , hasItems("must not be blank"))
+                .body("findAll{ it.fieldName == 'userName' }.error" , hasItems("must not be blank"))
+                .body("findAll{ it.fieldName == 'preferredName' }.error" , hasItems("must not be blank"));
     }
 
 }

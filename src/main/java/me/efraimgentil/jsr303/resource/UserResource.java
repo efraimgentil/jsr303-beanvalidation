@@ -1,5 +1,6 @@
 package me.efraimgentil.jsr303.resource;
 
+import me.efraimgentil.jsr303.model.User;
 import me.efraimgentil.jsr303.repository.UserRepository;
 import me.efraimgentil.jsr303.validation.annotation.UserExists;
 import org.hibernate.validator.constraints.Range;
@@ -8,10 +9,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
 
 @Component
 @Path("/users")
@@ -33,6 +38,13 @@ public class UserResource {
     @Path("{userId}")
     public Response getUser(@NotNull @UserExists @PathParam("userId") Integer userId){
         return Response.ok(userRepository.findById(userId)).build();
+    }
+
+    @POST
+    public Response createUser(@Valid User user , @Context UriInfo uriInfo){
+        User save = userRepository.save(user);
+        URI userUri = uriInfo.getAbsolutePathBuilder().path(Integer.toString(save.getId())).build();
+        return Response.created(userUri).build();
     }
 
 }
