@@ -1,6 +1,7 @@
 package me.efraimgentil.jsr303.resource;
 
 import me.efraimgentil.jsr303.repository.UserRepository;
+import me.efraimgentil.jsr303.validation.annotation.UserExists;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,12 @@ public class UserResource {
     public Response list(@NotNull @Range(min = 1 , max = 50) @QueryParam("limit") Integer limit,
                             @DefaultValue("0") @QueryParam("page") @Range(min = 0 , max = Integer.MAX_VALUE) Integer page){
         return Response.ok(userRepository.findAll(PageRequest.of(0 , limit ))).build();
+    }
+
+    @GET
+    @Path("{userId}")
+    public Response getUser(@NotNull @UserExists @PathParam("userId") Integer userId){
+        return Response.ok(userRepository.findById(userId)).build();
     }
 
 }

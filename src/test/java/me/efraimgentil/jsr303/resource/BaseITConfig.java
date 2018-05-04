@@ -2,6 +2,7 @@ package me.efraimgentil.jsr303.resource;
 
 
 import io.restassured.RestAssured;
+import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -26,7 +27,7 @@ public class BaseITConfig {
     @Before
     public void setUp(){
         RestAssured.port = serverPort;
-        RestAssured.filters(Arrays.asList( new ResponseLoggingFilter()));
+        RestAssured.filters(Arrays.asList( new RequestLoggingFilter(), new ResponseLoggingFilter()));
     }
 
 }

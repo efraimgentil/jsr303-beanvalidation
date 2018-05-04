@@ -1,5 +1,6 @@
 package me.efraimgentil.jsr303.resource;
 
+import me.efraimgentil.jsr303.model.User;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
@@ -12,10 +13,14 @@ import static org.hamcrest.Matchers.is;
 public class UserResourceIT extends BaseITConfig {
 
 
+    private final String GET_USERS = "/users";
+    private final String CREATE_USER = GET_USERS;
+    private final String GET_USER = "/users/{userId}";
+
     @Test
     public void shouldReturnBadRequestIfLimitIsNotInformed(){
         when()
-                .get("/users")
+                .get(GET_USERS)
         .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("[0].fieldName" , is("limit"))
@@ -27,7 +32,7 @@ public class UserResourceIT extends BaseITConfig {
         given()
                 .queryParam("limit" , 0)
         .when()
-                .get("/users")
+                .get(GET_USERS)
         .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("[0].fieldName" , is("limit"))
@@ -40,7 +45,7 @@ public class UserResourceIT extends BaseITConfig {
                 .queryParam("limit" , 0)
                 .queryParam("page" , -10)
         .when()
-                .get("/users")
+                .get(GET_USERS)
         .then()
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .body("$.size()" , is(2))
@@ -54,7 +59,7 @@ public class UserResourceIT extends BaseITConfig {
         given()
                 .queryParam("limit" , 10)
         .when()
-                .get("/users")
+                .get(GET_USERS)
         .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("$" , hasKey("content"))
@@ -63,6 +68,43 @@ public class UserResourceIT extends BaseITConfig {
                 .body("$" , hasKey("totalElements"))
                 .body("size" , is(10))
                 .body("number" , is(0));
+    }
+
+
+    @Test
+    public void shouldReturnBadRequestIfUserIdDoesNotExists(){
+        given()
+                .pathParam("userId" , Integer.MAX_VALUE)
+        .when()
+                .get(GET_USER)
+        .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("[0].fieldName" , is("userId"))
+                .body("[0].error" , is("User does not exists"));
+    }
+
+    @Test
+    public void shouldReturnTheUserIfTheUserIdExists(){
+        given()
+                .pathParam("userId" , 1)
+                .when()
+                .get(GET_USER)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("$" , hasKey("id"))
+                .body("$" , hasKey("fullName"))
+                .body("$" , hasKey("preferedName"))
+                .body("$" , hasKey("userName"));
+    }
+
+    @Test
+    public void shouldCreateAnNewUser(){
+        given()
+                .body(new User())
+        .when()
+                .post(CREATE_USER)
+        .then()
+                .statusCode(HttpStatus.CREATED.value());
     }
 
 }
