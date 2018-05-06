@@ -1,32 +1,30 @@
 package me.efraimgentil.jsr303.validation;
 
 import me.efraimgentil.jsr303.repository.UserRepository;
-import me.efraimgentil.jsr303.validation.annotation.UserExists;
+import me.efraimgentil.jsr303.validation.annotation.UniqueUsername;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import static org.springframework.util.StringUtils.isEmpty;
+
 @Component
-public class UserExistsValidator implements ConstraintValidator<UserExists,Integer> {
+public class UniqueUsernameValidator implements ConstraintValidator<UniqueUsername,String> {
 
     private UserRepository userRepository;
 
-    public UserExistsValidator() {
-    }
-
     @Autowired
-    public UserExistsValidator(UserRepository userRepository) {
+    public UniqueUsernameValidator(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
-    public boolean isValid(Integer value, ConstraintValidatorContext context) {
-        if(value != null) {
-           return userRepository.existsById(value);
+    public boolean isValid(String value, ConstraintValidatorContext context) {
+        if(!isEmpty(value)){
+            return !userRepository.existsByUserName(value);
         }
         return true;
     }
-
 }

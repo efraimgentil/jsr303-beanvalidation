@@ -134,4 +134,26 @@ public class UserResourceIT extends BaseITConfig {
                 .body("findAll{ it.fieldName == 'preferredName' }.error" , hasItems("must not be blank"));
     }
 
+    @Test
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:sql/createUsers.sql"),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:sql/deleteUsers.sql")
+    })
+    public void shouldReturnErrorIfTheUsernameIsAlreadyInUse(){
+        User user = new User();
+        user.setFullName("Full Name");
+        user.setUserName("userName1");
+        user.setPreferredName("Preferred Name");
+        given()
+                .body(user)
+                .contentType(MediaType.APPLICATION_JSON)
+        .when()
+                .post(CREATE_USER)
+        .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("$.size()" , is(1))
+                .body("fieldName" , hasItems( "userName" ))
+                .body("findAll{ it.fieldName == 'userName' }.error" , hasItems("already in use"));
+    }
+
 }

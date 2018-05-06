@@ -1,5 +1,7 @@
 package me.efraimgentil.jsr303.model;
 
+import me.efraimgentil.jsr303.validation.annotation.UniqueUsername;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
@@ -18,6 +20,7 @@ public class User implements Serializable {
     @NotBlank
     private String preferredName;
 
+    @UniqueUsername
     @NotBlank
     private String userName;
 
