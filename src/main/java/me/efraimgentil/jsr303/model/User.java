@@ -6,6 +6,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
+
+@UniqueUsername
 @Entity
 @Table(name = "USER")
 public class User implements Serializable {
@@ -20,7 +22,6 @@ public class User implements Serializable {
     @NotBlank
     private String preferredName;
 
-    @UniqueUsername
     @NotBlank
     private String userName;
 

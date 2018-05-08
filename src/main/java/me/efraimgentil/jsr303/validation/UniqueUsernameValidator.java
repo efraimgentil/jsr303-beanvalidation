@@ -1,5 +1,6 @@
 package me.efraimgentil.jsr303.validation;
 
+import me.efraimgentil.jsr303.model.User;
 import me.efraimgentil.jsr303.repository.UserRepository;
 import me.efraimgentil.jsr303.validation.annotation.UniqueUsername;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,7 @@ import javax.validation.ConstraintValidatorContext;
 import static org.springframework.util.StringUtils.isEmpty;
 
 @Component
-public class UniqueUsernameValidator implements ConstraintValidator<UniqueUsername,String> {
+public class UniqueUsernameValidator implements ConstraintValidator<UniqueUsername, User> {
 
     private UserRepository userRepository;
 
@@ -21,9 +22,16 @@ public class UniqueUsernameValidator implements ConstraintValidator<UniqueUserna
     }
 
     @Override
-    public boolean isValid(String value, ConstraintValidatorContext context) {
+    public boolean isValid(User value, ConstraintValidatorContext context) {
         if(!isEmpty(value)){
-            return !userRepository.existsByUserName(value);
+            boolean b = userRepository.existsByUserName(value.getUserName());
+            if(b){
+                context.disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate(UniqueUsername.MESSAGE)
+                        .addPropertyNode("userName")
+                        .addConstraintViolation();
+                return false;
+            }
         }
         return true;
     }

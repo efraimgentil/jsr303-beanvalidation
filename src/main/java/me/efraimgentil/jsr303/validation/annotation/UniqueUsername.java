@@ -8,11 +8,12 @@ import java.lang.annotation.*;
 
 @Documented
 @Constraint(validatedBy = UniqueUsernameValidator.class)
-@Target({ ElementType.PARAMETER, ElementType.FIELD, ElementType.ANNOTATION_TYPE })
+@Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UniqueUsername {
 
-    String message() default "already in use";
+    String MESSAGE = "already in use";
+    String message() default MESSAGE;
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 
