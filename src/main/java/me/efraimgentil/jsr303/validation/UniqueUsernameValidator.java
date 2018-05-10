@@ -24,8 +24,13 @@ public class UniqueUsernameValidator implements ConstraintValidator<UniqueUserna
     @Override
     public boolean isValid(User value, ConstraintValidatorContext context) {
         if(!isEmpty(value)){
-            boolean b = userRepository.existsByUserName(value.getUserName());
-            if(b){
+            boolean exists = false;
+            if(value.getId() != null) {
+                exists = userRepository.existsByUserNameEqualsAndIdNot(value.getUserName() , value.getId());
+            }else {
+                exists = userRepository.existsByUserName(value.getUserName());
+            }
+            if(exists){
                 context.disableDefaultConstraintViolation();
                 context.buildConstraintViolationWithTemplate(UniqueUsername.MESSAGE)
                         .addPropertyNode("userName")

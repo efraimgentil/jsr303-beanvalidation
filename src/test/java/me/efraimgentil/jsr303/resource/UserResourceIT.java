@@ -17,8 +17,9 @@ import static org.hamcrest.Matchers.is;
 public class UserResourceIT extends BaseITConfig {
 
     private final String GET_USERS = "/users";
-    private final String CREATE_USER = GET_USERS;
     private final String GET_USER = "/users/{userId}";
+    private final String CREATE_USER = GET_USERS;
+    private final String UPDATE_USER = GET_USER;
 
     @Test
     public void shouldReturnBadRequestIfLimitIsNotInformed(){
@@ -92,7 +93,7 @@ public class UserResourceIT extends BaseITConfig {
     })
     public void shouldReturnTheUserIfTheUserIdExists(){
         given()
-                .pathParam("userId" , 1)
+                .pathParam("userId" , 999)
         .when()
                 .get(GET_USER)
         .then()
@@ -142,7 +143,7 @@ public class UserResourceIT extends BaseITConfig {
     public void shouldReturnErrorIfTheUsernameIsAlreadyInUse(){
         User user = new User();
         user.setFullName("Full Name");
-        user.setUserName("userName1");
+        user.setUserName("testUsername");
         user.setPreferredName("Preferred Name");
         given()
                 .body(user)
@@ -154,6 +155,49 @@ public class UserResourceIT extends BaseITConfig {
                 .body("$.size()" , is(1))
                 .body("fieldName" , hasItems( "userName" ))
                 .body("findAll{ it.fieldName == 'userName' }.error" , hasItems("already in use"));
+    }
+
+    @Test
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:sql/createUsers.sql"),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:sql/deleteUsers.sql")
+    })
+    public void shouldReturnErrorIfTheUsernameIsAlreadyInUseWhenTryingToUpdate(){
+        User user = new User();
+        user.setFullName("Full Name");
+        user.setUserName("testUsername");
+        user.setPreferredName("Preferred Name");
+        given()
+                .pathParam("userId" , 1)
+                .body(user)
+                .contentType(MediaType.APPLICATION_JSON)
+        .when()
+                .put(UPDATE_USER)
+        .then()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .body("$.size()" , is(1))
+                .body("fieldName" , hasItems( "userName" ))
+                .body("findAll{ it.fieldName == 'userName' }.error" , hasItems("already in use"));
+    }
+
+    @Test
+    @SqlGroup({
+            @Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:sql/createUsers.sql"),
+            @Sql(executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD, scripts = "classpath:sql/deleteUsers.sql")
+    })
+    public void shouldUpdateSuccessfullyIfThereIsNoOtherRecordWithTheUserName(){
+        User user = new User();
+        user.setFullName("Full Name");
+        user.setUserName("testUsername2");
+        user.setPreferredName("Preferred Name");
+        given()
+                .pathParam("userId" , 1)
+                .body(user)
+                .contentType(MediaType.APPLICATION_JSON)
+        .when()
+                .put(UPDATE_USER)
+        .then()
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
 }

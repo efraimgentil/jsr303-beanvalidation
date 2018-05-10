@@ -4,6 +4,14 @@ import me.efraimgentil.jsr303.validation.annotation.UniqueUsername;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.MatrixParam;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
 

@@ -8,5 +8,7 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 
     boolean existsByUserName(String username);
 
+    boolean existsByUserNameEqualsAndIdNot(String username , Integer id);
+
 
 }
